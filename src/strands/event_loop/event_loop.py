@@ -157,6 +157,8 @@ async def event_loop_cycle(
                 yield model_event
 
         stop_reason, message, *_ = model_event["stop"]
+        if _has_tool_use_in_latest_message([message]): 
+            stop_reason = "tool_use"
         yield ModelMessageEvent(message=message)
 
     try:
@@ -349,6 +351,8 @@ async def _handle_model_execution(
                     yield event
 
                 stop_reason, message, usage, metrics = event["stop"]
+                if _has_tool_use_in_latest_message([message]): 
+                    stop_reason = "tool_use"
                 invocation_state.setdefault("request_state", {})
 
                 after_model_call_event = AfterModelCallEvent(
